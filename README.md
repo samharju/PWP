@@ -1,7 +1,7 @@
 # PWP SPRING 2021
 # PROJECT NAME
 # Group information
-* Student 1. Name and email
+* Student 1. Sami Harju sami.harju@gmail.com
 * Student 2. Teemu Hannnula thannula@gmail.com
 * Student 3. Name and email
 
