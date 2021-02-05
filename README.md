@@ -1,5 +1,5 @@
 # PWP SPRING 2021
-# PROJECT NAME
+# Lines API
 # Group information
 * Student 1. Sami Harju sami.harju@gmail.com
 * Student 2. Teemu Hannnula thannula@gmail.com
