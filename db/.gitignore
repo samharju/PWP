@@ -1,0 +1,2 @@
+# This is here just to commit empty db-dir for project structure.
+# .sqlite3 is ignored on top level ignore-config, no need to add here.
