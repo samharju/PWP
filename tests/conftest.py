@@ -5,7 +5,7 @@ from core.models import User, Rules
 
 @pytest.fixture()
 def dummy_user(name="tester"):
-    instance, _created = User.objects.get_or_create(name=name)
+    instance, _created = User.objects.get_or_create(username=name)
     return instance
 
 

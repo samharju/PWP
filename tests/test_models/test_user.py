@@ -49,7 +49,6 @@ def test_update_user_stats():
     user1 = User.objects.create_user(
         username='test',
         password='test123',
-        wins=1
     )
 
     user1.wins = 2
