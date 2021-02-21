@@ -24,11 +24,15 @@ __These instructions were made for Ubuntu 20.04 running Python 3.8.5.__
     ```bash
     ./migrate.sh
     ```
-4. Run tests
+4. Run only database tests
+    ```bash
+    pytest -v -m models
+    ```
+5. Run all tests and check code syntax
     ```bash
     ./test.sh
     ```
-5. Start application
+6. Start application
     ```bash
     ./run.sh
     ```
