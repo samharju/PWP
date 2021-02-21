@@ -36,3 +36,42 @@ def test_game_duplicate_user_not_allowed(dummy_user):
             player1=dummy_user,
             player2=dummy_user
         )
+
+
+def test_get_game_by_player(dummy_user):
+    """Filter games by players."""
+    Game.objects.create(
+        player1=dummy_user
+    )
+    tester2 = dummy_user("tester2")
+    Game.objects.create(
+        player1=tester2
+    )
+
+    games = Game.objects.filter(player1=tester2)
+    assert len(games) == 1
+    assert games[0].player1 == tester2
+
+
+def test_update_game(dummy_user):
+    """Turn is updated to db when edited."""
+    game = Game.objects.create(
+        player1=dummy_user
+    )
+
+    game.turn = 1
+    game.save()
+    game.refresh_from_db()
+    assert game.turn == 1
+
+
+def test_delete_game(dummy_user):
+    """Deleted game doesnt exist after deleted."""
+
+    game = Game.objects.create(
+        player1=dummy_user
+    )
+
+    game.delete()
+
+    assert 0 == len(Game.objects.filter(player1=dummy_user))
