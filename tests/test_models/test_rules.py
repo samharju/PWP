@@ -12,6 +12,7 @@ case. For each model the test script should, at least:
       situation where Integrity error might be raised)
 """
 import pytest
+from django.core.exceptions import ValidationError
 
 from core.models import Rules
 
@@ -54,7 +55,7 @@ faulty_rules = [
 @pytest.mark.parametrize("test_input", faulty_rules)
 def test_rules_validation(test_input):
     """Each rule property must be greater than zero."""
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError):
         Rules.objects.create(
             **test_input
         )

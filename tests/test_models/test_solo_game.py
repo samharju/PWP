@@ -18,7 +18,7 @@ from core.models import SoloGame
 pytestmark = [pytest.mark.django_db, pytest.mark.models]
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def sample_solo_game(dummy_user, dummy_rules):
     return SoloGame.objects.create(
         player=dummy_user,

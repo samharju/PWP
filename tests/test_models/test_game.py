@@ -12,6 +12,7 @@ case. For each model the test script should, at least:
       situation where Integrity error might be raised)
 """
 import pytest
+from django.core.exceptions import ValidationError
 
 from core.models import Game
 
@@ -29,34 +30,33 @@ def test_create_game(dummy_user, dummy_rules):
     assert game.winner == 0
 
 
-def test_game_duplicate_user_not_allowed(dummy_user):
+def test_game_duplicate_user_not_allowed(dummy_user, dummy_rules):
     """Same player can not be used twice for a game instance."""
-    with pytest.raises():
+    with pytest.raises(ValidationError):
         Game.objects.create(
             player1=dummy_user,
-            player2=dummy_user
+            player2=dummy_user,
+            rules=dummy_rules
         )
 
 
-def test_get_game_by_player(dummy_user):
+def test_get_game_by_player(dummy_user, dummy_rules):
     """Filter games by players."""
     Game.objects.create(
-        player1=dummy_user
-    )
-    tester2 = dummy_user("tester2")
-    Game.objects.create(
-        player1=tester2
+        player1=dummy_user,
+        rules=dummy_rules
     )
 
-    games = Game.objects.filter(player1=tester2)
+    games = Game.objects.filter(player1=dummy_user)
     assert len(games) == 1
-    assert games[0].player1 == tester2
+    assert games[0].player1 == dummy_user
 
 
-def test_update_game(dummy_user):
+def test_update_game(dummy_user, dummy_rules):
     """Turn is updated to db when edited."""
     game = Game.objects.create(
-        player1=dummy_user
+        player1=dummy_user,
+        rules=dummy_rules
     )
 
     game.turn = 1
@@ -65,11 +65,12 @@ def test_update_game(dummy_user):
     assert game.turn == 1
 
 
-def test_delete_game(dummy_user):
+def test_delete_game(dummy_user, dummy_rules):
     """Deleted game doesnt exist after deleted."""
 
     game = Game.objects.create(
-        player1=dummy_user
+        player1=dummy_user,
+        rules=dummy_rules
     )
 
     game.delete()
