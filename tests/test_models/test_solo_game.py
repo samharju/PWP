@@ -18,11 +18,31 @@ from core.models import SoloGame
 pytestmark = [pytest.mark.django_db, pytest.mark.models]
 
 
-def test_create_solo_game(dummy_user, dummy_rules):
-    """Create a game with valid options"""
-    game = SoloGame.objects.create(
+@pytest.fixture(scope="module")
+def sample_solo_game(dummy_user, dummy_rules):
+    return SoloGame.objects.create(
         player=dummy_user,
         rules=dummy_rules
     )
 
-    assert game.winner == 0
+
+def test_create_solo_game(sample_solo_game):
+    """Create a game with valid options"""
+    assert sample_solo_game.winner == 0
+
+
+def test_update_solo_game(sample_solo_game):
+    """Update solo game board"""
+    sample_solo_game.board = "12345"
+    sample_solo_game.save()
+    sample_solo_game.refresh_from_db()
+    assert sample_solo_game.board == "12345"
+
+
+def test_delete_solo_game(dummy_user, dummy_rules):
+    """Delete solo game"""
+    game = SoloGame.objects.create(
+        player=dummy_user,
+        rules=dummy_rules
+    )
+    game.delete()

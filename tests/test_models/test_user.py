@@ -42,3 +42,26 @@ def test_get_users_sorted_by_stats():
     users = User.objects.all().order_by("-wins")
     assert users[0] == user2
     assert users[1] == user1
+
+
+def test_update_user_stats():
+    """Update user win count after win"""
+    user1 = User.objects.create_user(
+        username='test',
+        password='test123',
+        wins=1
+    )
+
+    user1.wins = 2
+    user1.save()
+    user1.refresh_from_db()
+    assert user1.wins == 2
+
+
+def test_delete_user():
+    """Delete user"""
+    user = User.objects.create_user(
+        username='test',
+        password='test123',
+    )
+    user.delete()
