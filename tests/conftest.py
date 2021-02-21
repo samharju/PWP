@@ -1,5 +1,24 @@
 import pytest
 
+from core.models import User, Rules
+
+
+@pytest.fixture()
+def dummy_user():
+    instance, _created = User.objects.get_or_create("tester")
+    return instance
+
+
+@pytest.fixture()
+def dummy_rules():
+    instance, _created = Rules.objects.get_or_create(
+        name="tester",
+        rows=3,
+        columns=3,
+        winning_tick_count=3
+    )
+    return instance
+
 
 @pytest.fixture()
 def api_client():
