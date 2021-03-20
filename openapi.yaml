@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  description: Simple tic tac toe API for your delight
+  version: 1.0.1-oas3
+  title: Lines API
+components:
+  schemas:
+    AvailableGame:
+      type: object
+      properties:
+        player1:
+          type: string
+        rule:
+          type: string
+    CreateGame:
+      type: object
+      properties:
+        rule:
+          type: string
+paths:
+  /games:
+    get:
+      tags:
+        - Games
+      summary: List of games
+      description: List of unstarted available games
+      responses:
+        '200':
+          description: list of games
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailableGame'
+              examples:
+                some games:
+                  value:
+                    - player1: esa
+                      rule: 3x3
+                    - player1: pate
+                      rule: 10x10
+    post:
+      tags:
+        - Games
+      summary: Initialize new game
+      description: Initialize new game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGame'
+            examples:
+              foo:
+                summary: game using rule item of name 3x3
+                value:
+                  rule: 3x3
+      responses:
+        '201':
+          description: game created
+        '400':
+          description: rule with matching name not found
+  '/games/{game}':
+    parameters:
+      - name: game
+        in: path
+        description: id of selected game
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - Game
+      summary: Status of a game
+      responses:
+        '200':
+          description: ''
+    put:
+      tags:
+        - Game
+      summary: 'Insert new move '
+      responses:
+        '200':
+          description: ''
+    delete:
+      tags:
+        - Game
+      summary: Delete current game
+      responses:
+        '200':
+          description: ''
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get List of users
+      responses:
+        '200':
+          description: ''
+    post:
+      tags:
+        - Users
+      summary: Add new user
+      responses:
+        '200':
+          description: ''
+  '/user/{user}':
+    parameters:
+      - name: user
+        in: path
+        description: username of selected user
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - User
+      summary: User informatioN
+      responses:
+        '200':
+          description: ''
+    put:
+      tags:
+        - User
+      summary: Modify User
+      responses:
+        '200':
+          description: ''
+    delete:
+      tags:
+        - User
+      summary: Remove user
+      responses:
+        '200':
+          description: ''
+  /rules:
+    get:
+      tags:
+        - Rules
+      summary: get list of ruleset available
+      responses:
+        '200':
+          description: ''
+    post:
+      tags:
+        - Rules
+      summary: add new ruleset
+      responses:
+        '200':
+          description: ''
+  '/rules/{rule}':
+    parameters:
+      - name: rule
+        in: path
+        description: name of selected rule
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Rule
+      summary: show ruleset
+      responses:
+        '200':
+          description: ''
+    post:
+      tags:
+        - Rule
+      summary: modify ruleset
+      responses:
+        '200':
+          description: ''
+    delete:
+      tags:
+        - Rule
+      summary: delete ruleset
+      responses:
+        '200':
+          description: ''
