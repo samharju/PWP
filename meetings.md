@@ -43,15 +43,17 @@ Related work:
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*
 
 ## Meeting 2.
-* **DATE:**
-* **ASSISTANTS:**
+* **DATE: 25.2.2021**
+* **ASSISTANTS: Mika Oja**
 
 ### Minutes
-*Summary of what was discussed during the meeting*
+Checked db implementation.
 
 ### Action points
-*List here the actions points discussed with assistants*
 
+* Merge solo game and game to single model
+* Use positiveinteger for fields that are defined to require values >=0.
+* Check on_delete-rules of models.
 
 ### Comments from staff
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*
@@ -111,4 +113,3 @@ Related work:
 
 ### Comments from staff
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*
-
