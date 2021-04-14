@@ -14,18 +14,19 @@ case. For each model the test script should, at least:
 import pytest
 from django.core.exceptions import ValidationError
 
-from core.models import Rules
+from core.models import Rule
 
 pytestmark = [pytest.mark.django_db, pytest.mark.models]
 
 
-def test_create_rules():
+def test_create_rules(dummy_user):
     """Create rules instance with valid input."""
-    rules = Rules.objects.create(
+    rules = Rule.objects.create(
         name="test-create",
         rows=5,
         columns=5,
-        winning_tick_count=5
+        winning_tick_count=5,
+        author=dummy_user
     )
     assert rules.name == "test-create"
 
@@ -53,9 +54,10 @@ faulty_rules = [
 
 
 @pytest.mark.parametrize("test_input", faulty_rules)
-def test_rules_validation(test_input):
+def test_rules_validation(test_input, dummy_user):
     """Each rule property must be greater than zero."""
     with pytest.raises(ValidationError):
-        Rules.objects.create(
-            **test_input
+        Rule.objects.create(
+            **test_input,
+            author=dummy_user
         )
