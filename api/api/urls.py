@@ -16,8 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from core.views import EntryPoint
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("demo/", include("demo.urls")),
+    path("api/", EntryPoint.as_view(), name='entrypoint'),
+    path("api/users/", include("users.urls")),
+    path("api/rules/", include("rules.urls")),
+    path("api/demo/", include("demo.urls")),
 ]
