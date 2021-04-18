@@ -24,7 +24,7 @@ class EntryPoint(APIView):
                     }
                 },
                 "auth-token": {
-                    "href":  reverse('token', request=request),
+                    "href":  reverse('users:token', request=request),
                     "method": "POST",
                     "schema": {
                         "username": {
