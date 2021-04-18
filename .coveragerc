@@ -1,0 +1,7 @@
+[run]
+source = api
+omit =
+    venv,
+    */__init__.py,
+    api/manage.py,
+    api/api/*,
