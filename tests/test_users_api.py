@@ -1,5 +1,3 @@
-import json
-
 import pytest
 from django.contrib.auth import get_user_model
 from rest_framework import status
@@ -30,5 +28,5 @@ def test_anon_create_user(api_client):
     response = api_client.post(
         reverse('users:user-list'), data={'username': 'test', 'password': 'test123'}
     )
-    print(json.dumps(response.json(), indent=2))
     assert response.status_code == status.HTTP_201_CREATED
+    assert 'Location' in response.headers

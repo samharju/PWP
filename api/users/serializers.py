@@ -1,10 +1,57 @@
 from django.contrib.auth import get_user_model
+from rest_framework.reverse import reverse
 
-from rest_framework import serializers
+from core.serializers import MasonItemSerializer
 
 
-class UserSerializer(serializers.ModelSerializer):
+user_schema = {
+    "type": "object",
+    "properties": {
+        "username": {
+            "type": "string"
+        },
+        "password": {
+            "type": "string"
+        }
+    }
+}
+
+
+class UserItemSerializer(MasonItemSerializer):
     """Serializer for the users object"""
+
+    def create_controls(self, instance, request):
+        self_href = reverse('users:user-detail', request=request, args=(instance.pk,))
+        author_query = f'?author={instance.pk}'
+        controls = {
+            'self': {
+                'href': self_href
+            },
+            'collection': {
+                'href': reverse('users:user-list', request=request)
+            },
+            'history': {
+                'href': 'todo'
+            },
+            'rules-created': {
+                'href': reverse('rules:rule-list', request=request) + author_query,
+            }
+        }
+        if instance == request.user:
+            controls.update(
+                **{
+                    'edit': {
+                        'href': self_href,
+                        'method': 'PUT',
+                        'schema': user_schema
+                    },
+                    'delete': {
+                        'href': self_href,
+                        'method': 'DELETE'
+                    }
+                }
+            )
+        return controls
 
     class Meta:
         model = get_user_model()
@@ -26,3 +73,14 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class UserCollectionSerializer(UserItemSerializer):
+
+    def create_controls(self, instance, request):
+        self_href = reverse('users:user-detail', request=request, args=(instance.pk,))
+        return {
+            'self': {
+                'href': self_href
+            }
+        }

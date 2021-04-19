@@ -23,5 +23,5 @@ urlpatterns = [
     path("api/", EntryPoint.as_view(), name='entrypoint'),
     path("api/users/", include("users.urls")),
     path("api/rules/", include("rules.urls")),
-    path("api/demo/", include("demo.urls")),
+    path("api/leaderboard/", include("leaderboard.urls")),
 ]

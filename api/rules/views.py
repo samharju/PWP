@@ -51,6 +51,13 @@ class RuleViewSet(ModelViewSet):
     queryset = Rule.objects.all()
     permission_classes = [IsAuthenticated, OwnerEditOnly]
 
+    def get_queryset(self):
+        queryset = self.queryset
+        username = self.request.query_params.get('author')
+        if username is not None:
+            queryset = queryset.filter(author__username=username)
+        return queryset
+
     def get_serializer_class(self):
         if self.action == 'list':
             return RuleListSerializer

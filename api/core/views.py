@@ -15,11 +15,14 @@ class EntryPoint(APIView):
                     "href": reverse('users:user-list', request=request),
                     "method": "POST",
                     "schema": {
-                        "username": {
-                            "type": "string"
-                        },
-                        "password": {
-                            "type": "string"
+                        "type": "object",
+                        "properties": {
+                            "username": {
+                                "type": "string"
+                            },
+                            "password": {
+                                "type": "string"
+                            }
                         }
                     }
                 },
