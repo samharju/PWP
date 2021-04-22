@@ -5,8 +5,15 @@ from django.contrib.auth import get_user_model
 
 
 @pytest.fixture()
-def dummy_user(name='dummy', passwd='dummy'):
-    return get_user_model().objects.create_user(username=name, password=passwd)
+def dummy_user():
+    return get_user_model().objects.create_user(username='dummy', password='dummy')
+
+
+@pytest.fixture()
+def create_user():
+    def create(name, passwd='pass123'):
+        return get_user_model().objects.create_user(username=name, password=passwd)
+    return create
 
 
 @pytest.fixture()
@@ -28,8 +35,8 @@ def api_client():
 
 
 @pytest.fixture()
-def authenticate(api_client):
-    def auth_user(user):
+def authenticate(api_client, dummy_user):
+    def auth_user(user=dummy_user):
         api_client.force_authenticate(user=user)
         return api_client
     return auth_user
