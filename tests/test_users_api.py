@@ -29,4 +29,4 @@ def test_anon_create_user(api_client):
         reverse('users:user-list'), data={'username': 'test', 'password': 'test123'}
     )
     assert response.status_code == status.HTTP_201_CREATED
-    assert 'Location' in response.headers
+    assert reverse('users:user-detail', args=('test',)) in response.headers['Location']
