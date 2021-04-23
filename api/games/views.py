@@ -35,14 +35,14 @@ class GameViewSet(ModelViewSet):
     @action(detail=True, methods=['put'], url_name='join')
     def join(self, request, pk=None):
         game = self.get_object()
-        if game.player2:
-            return Response(
-                {'detail': 'Can\'t join full game'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         if request.user in [game.player1, game.player2]:
             return Response(
                 {'detail': 'You are already in this game'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if game.player2:
+            return Response(
+                {'detail': 'Can\'t join full game'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         game.player2 = request.user

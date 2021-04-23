@@ -80,22 +80,24 @@ class GameDetailSerializer(MasonItemSerializer):
                     }
                 }
             )
-        if instance.turn == 1 and request.user == instance.player1:
-            controls.update(
-                **{
-                    'add-move': {
-                        'href': reverse('games:game-add-move'),
-                        'method': 'PUT',
-                        'schema': {
-                            'type': 'object',
-                            'properties': {
-                                'row': 'number',
-                                'column': 'number'
+        if instance.player2:
+            player_num = [instance.player1, instance.player2].index(request.user) + 1
+            if instance.turn == player_num:
+                controls.update(
+                    **{
+                        'add-move': {
+                            'href': reverse('games:game-add-move', args=(instance.id,)),
+                            'method': 'PUT',
+                            'schema': {
+                                'type': 'object',
+                                'properties': {
+                                    'row': 'number',
+                                    'column': 'number'
+                                }
                             }
                         }
                     }
-                }
-            )
+                )
         return controls
 
     class Meta:
