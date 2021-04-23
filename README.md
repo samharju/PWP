@@ -38,3 +38,7 @@ __These instructions were made for Ubuntu 20.04 running Python 3.9.__
     ```bash
     ./run.sh
     ```
+7. Find api entrypoint with a client of your choice
+    
+    [http://localhost:8000/api/](http://localhost:8000/api/)
+    
