@@ -54,10 +54,6 @@ def test_join_game(authenticate, create_user, dummy_rule):
     response = getattr(client, game_join_control['method'].lower())(
         game_join_control['href']
     )
-    client = authenticate(pate)
-    game_item = client.get(collection['items'][0]['@controls']['self']['href']).json()
-
-    print(json.dumps(game_item, indent=2))
     assert response.status_code == status.HTTP_200_OK
 
 

@@ -8,7 +8,6 @@ class EntryPoint(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        print(request.user)
         response = {
             "@controls": {
                 "create-user": {
