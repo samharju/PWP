@@ -9,7 +9,7 @@ __Remember to include all required documentation and HOWTOs, including how to cr
 
 # Initial help stuff
 
-__These instructions were made for Ubuntu 20.04 running Python 3.8.5.__   
+__These instructions were made for Ubuntu 20.04 running Python 3.9.__   
 1. Create a virtual environment (optional)
     ```bash
     python -m venv venv
