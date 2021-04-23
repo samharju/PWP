@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/samharju/PWP/branch/master/graph/badge.svg?token=6RCP3VWOJJ)](https://codecov.io/gh/samharju/PWP)
+[![CI](https://github.com/samharju/PWP/actions/workflows/main.yml/badge.svg)](https://github.com/samharju/PWP/actions/workflows/main.yml)
 # PWP SPRING 2021
 # Lines API
 # Group information
