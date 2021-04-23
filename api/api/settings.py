@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "users",
     "rules",
     "leaderboard",
+    "games",
 ]
 
 MIDDLEWARE = [

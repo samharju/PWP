@@ -47,7 +47,7 @@ class EntryPoint(APIView):
                         "href": "todo"
                     },
                     "games": {
-                        "href": "todo"
+                        "href": reverse('games:game-list', request=request),
                     },
                     "rules": {
                         "href": reverse('rules:rule-list', request=request),
