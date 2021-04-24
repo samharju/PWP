@@ -76,9 +76,11 @@ class RuleViewSet(ModelViewSet):
             'items': serializer.data,
             '@controls': {
                 'up': {
-                    'href': reverse('entrypoint', request=request)
+                    'description': "Main menu",
+                    'href': reverse('entrypoint', request=request),
                 },
                 'create': {
+                    'description': "Create rule",
                     'href': reverse('rules:rule-list', request=request),
                     'method': 'POST',
                     'schema': create_schema

@@ -53,6 +53,7 @@ class GameViewSet(ModelViewSet):
                 'detail': 'Successfully joined game',
                 '@controls': {
                     'self': {
+                        'description': "Current game",
                         'href': reverse(
                             'games:game-detail', request=request, args=(pk,)
                         )
@@ -74,6 +75,7 @@ class GameViewSet(ModelViewSet):
         error_msg = {
             '@controls': {
                 'up': {
+                    'description': "Main menu",
                     'href': reverse(
                         'games:game-detail', request=request, args=(pk,)
                     )
@@ -127,9 +129,11 @@ class GameViewSet(ModelViewSet):
             'items': serializer.data,
             '@controls': {
                 'up': {
+                    'description': "Main menu",
                     'href': reverse('entrypoint', request=request)
                 },
                 'create': {
+                    'description': "Create game",
                     'href': reverse('games:game-list', request=request),
                     'method': 'POST',
                     'schema': {

@@ -1,5 +1,3 @@
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.permissions import BasePermission
 from rest_framework.reverse import reverse
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
@@ -14,10 +12,6 @@ class LeaderViewSet(ModelViewSet):
 
     permission_classes = []
 
-    # def get(self, serializers):
-        # return Response("Hello!")
-
-
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
@@ -25,10 +19,12 @@ class LeaderViewSet(ModelViewSet):
             'items': serializer.data,
             '@controls': {
                 'up': {
-                    'href': reverse('entrypoint', request=request)
+                    'href': reverse('entrypoint', request=request),
+                    'description': "Main menu",
                 },
                 'users': {
                     'href': reverse('users:user-list', request=request),
+                    'description': "List of users",
                 }
             }
         }
