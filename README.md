@@ -42,3 +42,6 @@ __These instructions were made for Ubuntu 20.04 running Python 3.9.__
     
     [http://localhost:8000/api/](http://localhost:8000/api/)
     
+# Web Client
+
+See https://github.com/Stugeh/LinesClient
