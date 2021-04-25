@@ -4,9 +4,13 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.viewsets import ModelViewSet
 
-from users.serializers import UserCollectionSerializer, UserItemSerializer, user_schema
-
 from core.models import User
+from users.serializers import (
+    UserCollectionSerializer,
+    UserItemSerializer,
+    UserUpdateSerializer,
+    user_schema,
+)
 
 
 class AnonCreateAndUpdateOwnerOnly(BasePermission):
@@ -36,6 +40,8 @@ class UserViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return UserCollectionSerializer
+        if self.action == 'update':
+            return UserUpdateSerializer
         return UserItemSerializer
 
     def get_success_headers(self, data):
@@ -44,6 +50,12 @@ class UserViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         response.data = None
+        return response
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        response.data = None
+        response.status_code = 204
         return response
 
     def list(self, request, *args, **kwargs):

@@ -7,13 +7,11 @@ from core.serializers import MasonItemSerializer
 user_schema = {
     "type": "object",
     "properties": {
-        "username": {
-            "type": "string"
-        },
         "password": {
             "type": "string"
         }
-    }
+    },
+    "required": ["password"]
 }
 
 
@@ -79,6 +77,13 @@ class UserItemSerializer(MasonItemSerializer):
             user.save()
 
         return user
+
+
+class UserUpdateSerializer(UserItemSerializer):
+
+    class Meta:
+        model = get_user_model()
+        fields = ('password',)
 
 
 class UserCollectionSerializer(UserItemSerializer):
