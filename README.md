@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/samharju/PWP/branch/master/graph/badge.svg?token=6RCP3VWOJJ)](https://codecov.io/gh/samharju/PWP)
+[![CI](https://github.com/samharju/PWP/actions/workflows/main.yml/badge.svg)](https://github.com/samharju/PWP/actions/workflows/main.yml)
 # PWP SPRING 2021
 # Lines API
 # Group information
@@ -36,3 +38,7 @@ __These instructions were made for Ubuntu 20.04 running Python 3.9.__
     ```bash
     ./run.sh
     ```
+7. Find api entrypoint with a client of your choice
+    
+    [http://localhost:8000/api/](http://localhost:8000/api/)
+    
