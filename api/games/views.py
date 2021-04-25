@@ -92,6 +92,11 @@ class GameViewSet(ModelViewSet):
             error_msg['detail'] = error
             return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
 
+        if game.turn == 1:
+            game.turn = 2
+        elif game.turn == 2:
+            game.turn = 1
+
         if is_winning_move(game.rule, board, move):
             winner = players.index(request.user)
             game.winner = winner + 1
