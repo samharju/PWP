@@ -11,6 +11,7 @@ class EntryPoint(APIView):
         response = {
             "@controls": {
                 "create-user": {
+                    'description': "Create new user",
                     "href": reverse('users:user-list', request=request),
                     "method": "POST",
                     "schema": {
@@ -26,6 +27,7 @@ class EntryPoint(APIView):
                     }
                 },
                 "auth-token": {
+                    'description': "Get token for user",
                     "href":  reverse('users:token', request=request),
                     "method": "POST",
                     "schema": {
@@ -43,12 +45,15 @@ class EntryPoint(APIView):
             response = {
                 "@controls": {
                     "leaderboard": {
-                        "href": "todo"
+                        'description': "Leaderboard",
+                        "href": reverse('leaderboard:user-list', request=request),
                     },
                     "games": {
+                        'description': "Games",
                         "href": reverse('games:game-list', request=request),
                     },
                     "rules": {
+                        'description': "Rules",
                         "href": reverse('rules:rule-list', request=request),
                     }
                 }

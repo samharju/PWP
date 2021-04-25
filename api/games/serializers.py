@@ -11,6 +11,7 @@ class GameCreateSerializer(MasonItemSerializer):
     def create_controls(self, instance, request):
         return {
             'self': {
+                'description': "Game detail",
                 'href': reverse(
                     'games:game-detail', request=request, args=(instance.id,)
                 )
@@ -27,6 +28,7 @@ class GameListSerializer(MasonItemSerializer):
     def create_controls(self, instance, request):
         return {
             'self': {
+                'description': "Game list",
                 'href': reverse(
                     'games:game-detail', request=request, args=(instance.id,)
                 )
@@ -64,6 +66,7 @@ class GameDetailSerializer(MasonItemSerializer):
     def create_controls(self, instance, request):
         self_href = reverse('games:game-detail', request=request, args=(instance.id,))
         controls = {
+            'description': "Game",
             'self': {
                 'href': self_href
             }
@@ -72,6 +75,7 @@ class GameDetailSerializer(MasonItemSerializer):
             controls.update(
                 **{
                     'join': {
+                        'description': "Join game",
                         'href': reverse(
                             'games:game-join', request=request,
                             args=(instance.id,)
@@ -86,6 +90,7 @@ class GameDetailSerializer(MasonItemSerializer):
                 controls.update(
                     **{
                         'add-move': {
+                            'description': "Add move",
                             'href': reverse('games:game-add-move', args=(instance.id,)),
                             'method': 'PUT',
                             'schema': {
