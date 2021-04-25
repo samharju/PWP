@@ -141,3 +141,39 @@ def test_errors(create_user, authenticate, dummy_rule):
         data={'row': 55, 'column': -5}
     )
     assert res.status_code == status.HTTP_400_BAD_REQUEST
+
+
+def test_add_move_changes_turn(authenticate, create_user, dummy_rule):
+    pate = create_user('pate')
+    esa = create_user('esa')
+    client = authenticate(pate)
+
+    game = Game.objects.create(
+        player1=pate,
+        player2=esa,
+        rule=dummy_rule,
+        board='         ',
+        turn=1
+    )
+    res = client.put(
+        reverse('games:game-add-move', args=(game.id,)),
+        data={'row': 1, 'column': 1}
+    )
+    assert res.status_code == status.HTTP_204_NO_CONTENT
+
+    res = client.get(
+        reverse('games:game-detail', args=(game.id,))
+    )
+    assert res.json()['turn'] == 2
+
+    client = authenticate(esa)
+    res = client.put(
+        reverse('games:game-add-move', args=(game.id,)),
+        data={'row': 0, 'column': 1}
+    )
+    assert res.status_code == status.HTTP_204_NO_CONTENT
+
+    res = client.get(
+        reverse('games:game-detail', args=(game.id,))
+    )
+    assert res.json()['turn'] == 1
