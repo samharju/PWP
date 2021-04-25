@@ -53,12 +53,14 @@ class UserViewSet(ModelViewSet):
             'items': serializer.data,
             '@controls': {
                 'up': {
-                    'href': reverse('entrypoint', request=request)
+                    'description': "Main menu",
+                    'href': reverse('entrypoint', request=request),
                 },
                 'create': {
+                    'description': "Create new user",
                     'href': reverse('users:user-list', request=request),
                     "method": "POST",
-                    "schema": user_schema
+                    "schema": user_schema,
                 }
             }
         }
@@ -73,6 +75,7 @@ class ObtainAuthTokenWithControls(ObtainAuthToken):
             **{
                 '@controls': {
                     'up': {
+                        'description': "Main menu",
                         'href': reverse('entrypoint', request=request)
                     }
                 }

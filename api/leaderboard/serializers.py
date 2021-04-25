@@ -4,10 +4,9 @@ from rest_framework import serializers
 
 
 class LeaderSerializer(serializers.ModelSerializer):
-    """Serializer for the users object"""
+    """Serializer for the leaderboard object"""
 
     class Meta:
         model = get_user_model()
         fields = ('username', 'win_percentage', 'wins', 'losses')
         read_only_fields = ('username', 'win_percentage', 'wins', 'losses')
- 
