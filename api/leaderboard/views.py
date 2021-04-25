@@ -6,8 +6,9 @@ from leaderboard.serializers import LeaderSerializer
 
 from core.models import User
 
+
 class LeaderViewSet(ModelViewSet):
-    queryset = User.objects.all().order_by("win_percentage")
+    queryset = User.objects.all().order_by("-win_percentage")
     serializer_class = LeaderSerializer
 
     permission_classes = []
