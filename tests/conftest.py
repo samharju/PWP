@@ -40,3 +40,10 @@ def authenticate(api_client, dummy_user):
         api_client.force_authenticate(user=user)
         return api_client
     return auth_user
+
+
+@pytest.fixture()
+def pate_and_esa():
+    pate = get_user_model().objects.create_user(username='pate', password='dummy')
+    esa = get_user_model().objects.create_user(username='esa', password='dummy')
+    return pate, esa
