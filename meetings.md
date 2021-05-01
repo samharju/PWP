@@ -75,7 +75,7 @@ Checked db implementation.
 
 ## Meeting 4.
 * **DATE: 19.4.**
-* **ASSISTANTS:**
+* **ASSISTANTS: Mika Oja**
 
 ### Minutes
 * Quick code review
