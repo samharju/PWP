@@ -73,7 +73,7 @@ class GameViewSet(ModelViewSet):
         row = request.data.get('row')
         col = request.data.get('column')
 
-        if not all([row, col]):
+        if not all([row is not None, col is not None]):
             return mason_error('Row and column are required values')
 
         move = Move(int(row), int(col), marker)
