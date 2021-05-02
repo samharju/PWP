@@ -29,12 +29,18 @@ class GameViewSet(ModelViewSet):
 
     queryset = Game.objects.all()
 
-    def get_queryset(self, request=None):
+    def get_queryset(self):
         if self.action == 'list':
-            queryset = Game.objects.filter(player2=None) | \
+            if user := self.request.query_params.get('history'):
+                queryset = Game.objects.filter(
+                    Q(player1=user) | Q(player2=user),
+                    ~Q(winner=0)
+                )
+            else:
+                queryset = Game.objects.filter(player2=None) | \
                        Game.objects.filter(
                            Q(winner=0),
-                           Q(player1=request.user) | Q(player2=request.user)
+                           Q(player1=self.request.user) | Q(player2=self.request.user)
                        )
             return queryset
         return self.queryset
@@ -117,7 +123,7 @@ class GameViewSet(ModelViewSet):
         return {'Location': data['@controls']['self']['href']}
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset(request))
+        queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
         response = {
             'items': serializer.data,

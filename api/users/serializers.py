@@ -23,7 +23,7 @@ class UserItemSerializer(MasonItemSerializer):
         author_query = f'?author={instance.pk}'
         controls = {
             'self': {
-                'description': "Main menu",
+                'description': "Current user",
                 'href': self_href
             },
             'collection': {
@@ -31,11 +31,11 @@ class UserItemSerializer(MasonItemSerializer):
                 'href': reverse('users:user-list', request=request)
             },
             'history': {
-                'description': "User's history",
-                'href': 'todo'
+                'description': "This users game history",
+                'href': reverse('games:game-list', request=request) + '?history=' + instance.pk
             },
             'rules-created': {
-                'description': "List of Rules",
+                'description': "Rules created by user",
                 'href': reverse('rules:rule-list', request=request) + author_query,
             }
         }
@@ -43,7 +43,7 @@ class UserItemSerializer(MasonItemSerializer):
             controls.update(
                 **{
                     'edit': {
-                        'description': "Modify User",
+                        'description': "Change password",
                         'href': self_href,
                         'method': 'PUT',
                         'schema': user_schema
