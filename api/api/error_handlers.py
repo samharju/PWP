@@ -33,7 +33,11 @@ def custom_exception_handler(exc, context):
                 '@message': msg
             }
         mason = {'@error': error}
-        return Response(status=response.status_code, data=mason, headers=response.headers)
+        return Response(
+            status=response.status_code,
+            data=mason,
+            headers=response.headers
+        )
 
     return response
 
