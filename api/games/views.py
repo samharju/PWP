@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.viewsets import ModelViewSet
 
+from api.error_handlers import mason_error
 from core.models import Game
 from games.serializers import (
     GameCreateSerializer, GameDetailSerializer,
@@ -36,15 +37,9 @@ class GameViewSet(ModelViewSet):
     def join(self, request, pk=None):
         game = self.get_object()
         if request.user in [game.player1, game.player2]:
-            return Response(
-                {'detail': 'You are already in this game'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return mason_error('You are already in this game')
         if game.player2:
-            return Response(
-                {'detail': 'Can\'t join full game'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return mason_error('Can\'t join full game')
         game.player2 = request.user
         game.turn = 1
         game.save()
@@ -72,25 +67,13 @@ class GameViewSet(ModelViewSet):
         row = request.data.get('row')
         col = request.data.get('column')
 
-        error_msg = {
-            '@controls': {
-                'up': {
-                    'description': "Main menu",
-                    'href': reverse(
-                        'games:game-detail', request=request, args=(pk,)
-                    )
-                }
-            }
-        }
         if not all([row, col]):
-            error_msg['detail'] = 'Row and column are required values'
-            return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+            return mason_error('Row and column are required values')
 
         move = Move(int(row), int(col), marker)
         ok, error = add_move_if_ok(board, move)
         if not ok:
-            error_msg['detail'] = error
-            return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+            return mason_error(error)
 
         if game.turn == 1:
             game.turn = 2
