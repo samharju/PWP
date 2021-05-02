@@ -145,7 +145,8 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_RENDERER_CLASSES": [
         "api.renderers.MasonRenderer"
-    ]
+    ],
+    "EXCEPTION_HANDLER": "api.error_handlers.custom_exception_handler"
 }
 
 
