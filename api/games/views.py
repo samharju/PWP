@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -28,9 +29,14 @@ class GameViewSet(ModelViewSet):
 
     queryset = Game.objects.all()
 
-    def get_queryset(self):
+    def get_queryset(self, request=None):
         if self.action == 'list':
-            return Game.objects.filter(player2=None)
+            queryset = Game.objects.filter(player2=None) | \
+                       Game.objects.filter(
+                           Q(winner=0),
+                           Q(player1=request.user) | Q(player2=request.user)
+                       )
+            return queryset
         return self.queryset
 
     @action(detail=True, methods=['put'], url_name='join')
@@ -111,7 +117,7 @@ class GameViewSet(ModelViewSet):
         return {'Location': data['@controls']['self']['href']}
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.filter_queryset(self.get_queryset(request))
         serializer = self.get_serializer(queryset, many=True)
         response = {
             'items': serializer.data,
