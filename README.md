@@ -45,3 +45,13 @@ __These instructions were made for Ubuntu 20.04 running Python 3.9.__
 # Web Client
 
 See https://github.com/Stugeh/LinesClient
+
+
+# Admin site
+
+Create a superuser with
+```bash
+python manage.py createsuperuser
+```
+
+Access admin site via [http://localhost:8000/admin](http://localhost:8000/admin)

@@ -6,6 +6,7 @@ from django.db import models
 
 
 class User(AbstractUser):
+    """Override default user model"""
     username = models.CharField(
         max_length=150,
         unique=True,
@@ -23,6 +24,7 @@ class User(AbstractUser):
 
 
 class Rule(models.Model):
+    """Rule model to define size and end condition for game"""
     name = models.CharField(max_length=50, primary_key=True)
     rows = models.PositiveIntegerField(
         default=3,
@@ -52,11 +54,17 @@ class Rule(models.Model):
     )
 
     def save(self, *args, **kwargs):
+        """Call full_clean to enforce validation."""
         self.full_clean()
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        """String representation mainly for development and admin site."""
+        return str(self.name)
+
 
 class Game(models.Model):
+    """Game model to define a match."""
     player1 = models.ForeignKey(
         User, on_delete=models.SET_NULL, related_name='starter',
         null=True
@@ -78,9 +86,15 @@ class Game(models.Model):
     rule = models.ForeignKey(Rule, on_delete=models.PROTECT)
 
     def clean(self, *args, **kwargs):
+        """Custom validation"""
         if self.player1 == self.player2:
             raise ValidationError("You can't play against yourself!")
 
     def save(self, *args, **kwargs):
+        """Call full_clean to enforce validation."""
         self.full_clean()
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        """String representation mainly for development and admin site."""
+        return f"{self.pk}: {self.player1} vs {self.player2}"
