@@ -1,9 +1,9 @@
 from django.db.models import Q
-from rest_framework import status
+from rest_framework import status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from api.error_handlers import mason_error
 from core.models import Game
@@ -25,7 +25,10 @@ def update_player_stats(winner, loser):
         user.save()
 
 
-class GameViewSet(ModelViewSet):
+class GameViewSet(GenericViewSet,
+                  mixins.RetrieveModelMixin,
+                  mixins.CreateModelMixin,
+                  mixins.ListModelMixin):
 
     queryset = Game.objects.all()
 

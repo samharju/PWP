@@ -1,8 +1,8 @@
-from rest_framework import permissions
+from rest_framework import permissions, mixins
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from core.models import Rule
 from rules.serializers import RuleDetailSerializer, RuleListSerializer
@@ -46,7 +46,11 @@ create_schema = {
 }
 
 
-class RuleViewSet(ModelViewSet):
+class RuleViewSet(GenericViewSet,
+                  mixins.ListModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.CreateModelMixin,
+                  mixins.DestroyModelMixin):
 
     queryset = Rule.objects.all()
     permission_classes = [IsAuthenticated, OwnerEditOnly]
