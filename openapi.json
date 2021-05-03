@@ -1,0 +1,1486 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Lines API",
+    "version": "1.0",
+    "description": "API for playing the finnish game \"Jatkanshakki\", translates roughly as \"Lumberjacks tic-tac-toe\". Exactly the same as traditional version, but board and number of own markers in line required to win can be changed in range from 3 to 10."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/",
+      "description": "local"
+    }
+  ],
+  "security": [
+    {
+      "apiKey": [
+        "Authentication"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Entrypoint"
+    },
+    {
+      "name": "Leaderboard"
+    },
+    {
+      "name": "Create user"
+    },
+    {
+      "name": "Users"
+    },
+    {
+      "name": "Games"
+    },
+    {
+      "name": "Game Item"
+    },
+    {
+      "name": "Rules"
+    },
+    {
+      "name": "Rule Item"
+    }
+  ],
+  "paths": {
+    "/api/": {
+      "get": {
+        "operationId": "listEntryPoints",
+        "description": "Get available resources as controls",
+        "security": [
+          {}
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.mason+json": {
+                "example": {
+                  "@controls": {
+                    "create-user": {
+                      "description": "Create new user",
+                      "href": "http://localhost:8000/api/users/",
+                      "method": "POST",
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "username": {
+                            "type": "string"
+                          },
+                          "password": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "auth-token": {
+                      "description": "Get token for user",
+                      "href": "http://localhost:8000/api/users/token",
+                      "method": "POST",
+                      "schema": {
+                        "username": {
+                          "type": "string"
+                        },
+                        "password": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Returns separate available resources by authentication status"
+          }
+        },
+        "tags": [
+          "Entrypoint"
+        ]
+      }
+    },
+    "/api/users/": {
+      "get": {
+        "operationId": "listUsers",
+        "description": "Get all registered users",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserCollection"
+                  }
+                },
+                "example": {
+                  "items": [
+                    {
+                      "username": "sami",
+                      "win_percentage": "1.00",
+                      "wins": 1,
+                      "losses": 0,
+                      "@controls": {
+                        "self": {
+                          "description": "Current User",
+                          "href": "http://localhost:8000/api/users/sami/"
+                        }
+                      }
+                    },
+                    {
+                      "username": "esa",
+                      "win_percentage": "0.00",
+                      "wins": 0,
+                      "losses": 1,
+                      "@controls": {
+                        "self": {
+                          "description": "Current User",
+                          "href": "http://localhost:8000/api/users/esa/"
+                        }
+                      }
+                    },
+                    {
+                      "username": "admin",
+                      "win_percentage": "0.00",
+                      "wins": 0,
+                      "losses": 0,
+                      "@controls": {
+                        "self": {
+                          "description": "Current User",
+                          "href": "http://localhost:8000/api/users/admin/"
+                        }
+                      }
+                    }
+                  ],
+                  "@controls": {
+                    "up": {
+                      "description": "Main menu",
+                      "href": "http://localhost:8000/api/"
+                    },
+                    "create": {
+                      "description": "Create new user",
+                      "href": "http://localhost:8000/api/users/",
+                      "method": "POST",
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "password": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "password"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "All registered users."
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      },
+      "post": {
+        "operationId": "createUser",
+        "description": "Create a new user with provided username and password.",
+        "parameters": [],
+        "security": [
+          {}
+        ],
+        "requestBody": {
+          "content": {
+            "application/vnd.mason+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Location for created item"
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "username: A user with that username already exists."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Create user"
+        ]
+      }
+    },
+    "/api/users/{username}/": {
+      "get": {
+        "operationId": "retrieveUser",
+        "description": "Get user details.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "A unique value identifying this user.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserItem"
+                },
+                "example": {
+                  "username": "teppo",
+                  "win_percentage": "0.66",
+                  "wins": 2,
+                  "losses": 1,
+                  "@controls": {
+                    "self": {
+                      "description": "Current user",
+                      "href": "http://localhost:8000/api/users/teppo/"
+                    },
+                    "collection": {
+                      "description": "List of Users",
+                      "href": "http://localhost:8000/api/users/"
+                    },
+                    "history": {
+                      "description": "This users game history",
+                      "href": "http://localhost:8000/api/games/?history=teppo"
+                    },
+                    "rules-created": {
+                      "description": "Rules created by user",
+                      "href": "http://localhost:8000/api/rules/?author=teppo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Item"
+        ]
+      },
+      "put": {
+        "operationId": "updateUser",
+        "description": "Change user password",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "A unique value identifying this user.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Password updated successfully."
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Item"
+        ]
+      },
+      "delete": {
+        "operationId": "destroyUser",
+        "description": "Remove user. Only allowed by user themself.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "A unique value identifying this user.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User removed successfully."
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No object permissions.",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "You do not have permission to perform this action."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Item"
+        ]
+      }
+    },
+    "/api/rules/": {
+      "get": {
+        "operationId": "listRules",
+        "description": "Get list of existing rules.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RuleList"
+                  }
+                },
+                "example": {
+                  "items": [
+                    {
+                      "name": "3x3x3",
+                      "rows": 3,
+                      "columns": 3,
+                      "winning_tick_count": 3,
+                      "author": "sami",
+                      "@controls": {
+                        "self": {
+                          "description": "Current rule",
+                          "href": "http://localhost:8000/api/rules/3x3x3/"
+                        }
+                      }
+                    },
+                    {
+                      "name": "5x5x5",
+                      "rows": 5,
+                      "columns": 5,
+                      "winning_tick_count": 5,
+                      "author": "sami",
+                      "@controls": {
+                        "self": {
+                          "description": "Current rule",
+                          "href": "http://localhost:8000/api/rules/5x5x5/"
+                        }
+                      }
+                    },
+                    {
+                      "name": "big game",
+                      "rows": 10,
+                      "columns": 10,
+                      "winning_tick_count": 7,
+                      "author": "sami",
+                      "@controls": {
+                        "self": {
+                          "description": "Current rule",
+                          "href": "http://localhost:8000/api/rules/big%20game/"
+                        }
+                      }
+                    }
+                  ],
+                  "@controls": {
+                    "up": {
+                      "description": "Main menu",
+                      "href": "http://localhost:8000/api/"
+                    },
+                    "create": {
+                      "description": "Create rule",
+                      "href": "http://localhost:8000/api/rules/",
+                      "method": "POST",
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "description": "rule name",
+                            "type": "string"
+                          },
+                          "rows": {
+                            "description": "number of rows",
+                            "type": "integer",
+                            "minimum": 3,
+                            "maximum": 10
+                          },
+                          "columns": {
+                            "description": "number of columns",
+                            "type": "integer",
+                            "minimum": 3,
+                            "maximum": 10
+                          },
+                          "winning_tick_count": {
+                            "description": "number of ticks to get in line to win",
+                            "type": "integer",
+                            "minimum": 3,
+                            "maximum": 10
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Rules"
+        ]
+      },
+      "post": {
+        "operationId": "createRule",
+        "description": "Create new rule. User automatically added as author.",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleDetail"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Rule successfully created",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Location for created item"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Rules"
+        ]
+      }
+    },
+    "/api/rules/{name}/": {
+      "get": {
+        "operationId": "retrieveRule",
+        "description": "Get rule details",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "description": "A unique value identifying this rule.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleDetail"
+                },
+                "example": {
+                  "name": "5x5x5",
+                  "rows": 5,
+                  "columns": 5,
+                  "winning_tick_count": 5,
+                  "author": "sami",
+                  "@controls": {
+                    "self": {
+                      "description": "Current rule",
+                      "href": "http://localhost:8000/api/rules/5x5x5/"
+                    },
+                    "collection": {
+                      "description": "Rule collection",
+                      "href": "http://localhost:8000/api/rules/"
+                    },
+                    "author": {
+                      "description": "Author for rule",
+                      "href": "http://localhost:8000/api/users/sami/"
+                    },
+                    "delete": {
+                      "description": "Delete rule",
+                      "href": "http://localhost:8000/api/rules/5x5x5/",
+                      "method": "DELETE"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Rule details"
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Rule Item"
+        ]
+      },
+      "delete": {
+        "operationId": "destroyRule",
+        "description": "Delete rule. Allowed only if game has not been used in a game.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "description": "A unique value identifying this rule.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Item successfully deleted."
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No object permissions.",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "You do not have permission to perform this action."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Rule Item"
+        ]
+      }
+    },
+    "/api/leaderboard/": {
+      "get": {
+        "operationId": "listLeaders",
+        "description": "Get list of top 10 players.",
+        "security": [
+          {}
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Leader"
+                  }
+                },
+                "example": {
+                  "items": [
+                    {
+                      "username": "sami",
+                      "win_percentage": "1.00",
+                      "wins": 1,
+                      "losses": 0
+                    },
+                    {
+                      "username": "esa",
+                      "win_percentage": "0.00",
+                      "wins": 0,
+                      "losses": 1
+                    }
+                  ],
+                  "@controls": {
+                    "up": {
+                      "href": "http://localhost:8000/api/",
+                      "description": "Main menu"
+                    },
+                    "users": {
+                      "href": "http://localhost:8000/api/users/",
+                      "description": "List users"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Retrieved user list"
+          }
+        },
+        "tags": [
+          "Leaderboard"
+        ]
+      }
+    },
+    "/api/games/": {
+      "get": {
+        "operationId": "listGames",
+        "description": "List available new games and users unfinished games or player history with query.",
+        "parameters": [
+          {
+            "name": "history",
+            "in": "query",
+            "description": "username to get history for",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GameList"
+                  }
+                },
+                "example": {
+                  "items": [
+                    {
+                      "player1": "jorge",
+                      "rule": "3x3x3",
+                      "@controls": {
+                        "self": {
+                          "description": "Game details",
+                          "href": "http://localhost:8000/api/games/2/"
+                        }
+                      }
+                    },
+                    {
+                      "player1": "sami",
+                      "rule": "3x3x3",
+                      "@controls": {
+                        "self": {
+                          "description": "Game details",
+                          "href": "http://localhost:8000/api/games/3/"
+                        }
+                      }
+                    },
+                    {
+                      "player1": "teppo",
+                      "rule": "3x3x3",
+                      "@controls": {
+                        "self": {
+                          "description": "Game details",
+                          "href": "http://localhost:8000/api/games/4/"
+                        }
+                      }
+                    },
+                    {
+                      "player1": "pate",
+                      "rule": "3x3x3",
+                      "@controls": {
+                        "self": {
+                          "description": "Game details",
+                          "href": "http://localhost:8000/api/games/5/"
+                        }
+                      }
+                    },
+                    {
+                      "player1": "aulis",
+                      "rule": "3x3x3",
+                      "@controls": {
+                        "self": {
+                          "description": "Game details",
+                          "href": "http://localhost:8000/api/games/6/"
+                        }
+                      }
+                    }
+                  ],
+                  "@controls": {
+                    "up": {
+                      "description": "Main menu",
+                      "href": "http://localhost:8000/api/"
+                    },
+                    "create": {
+                      "description": "Create game",
+                      "href": "http://localhost:8000/api/games/",
+                      "method": "POST",
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "rule": {
+                            "type": "string",
+                            "description": "name of rule to be used"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Games"
+        ]
+      },
+      "post": {
+        "operationId": "createGame",
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Game succesfully created",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Location for created item"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Games"
+        ]
+      }
+    },
+    "/api/games/{id}/": {
+      "get": {
+        "operationId": "retrieveGame",
+        "description": "Get game situation.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "A unique integer value identifying this game.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameDetail"
+                },
+                "example": {
+                  "board": [
+                    [
+                      "O",
+                      "X",
+                      " "
+                    ],
+                    [
+                      "O",
+                      "X",
+                      " "
+                    ],
+                    [
+                      " ",
+                      "X",
+                      " "
+                    ]
+                  ],
+                  "turn": 0,
+                  "winner": 1,
+                  "player1": "sami",
+                  "player2": "esa",
+                  "rule": "3x3x3",
+                  "@controls": {
+                    "description": "Game",
+                    "self": {
+                      "href": "http://localhost:8000/api/games/1/"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Game status."
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Game Item"
+        ]
+      }
+    },
+    "/api/users/token": {
+      "post": {
+        "operationId": "createAuthToken",
+        "description": "",
+        "security": [
+          {}
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthToken"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthToken"
+                },
+                "example": {
+                  "token": "86fa00701ffe264a218ac2fb2d27afb280a2d003",
+                  "@controls": {
+                    "up": {
+                      "description": "Main menu",
+                      "href": "http://localhost:8000/api/"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "User authentication successful, token provided"
+          },
+          "400": {
+            "description": "Faulty request, username or password incorrect",
+            "content": {
+              "application/vnd.mason+json": {
+                "example": {
+                  "@error": {
+                    "@message": "non_field_errors: Unable to log in with provided credentials."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/games/{id}/add-move/": {
+      "put": {
+        "operationId": "addMoveGame",
+        "description": "Make your mark in the gameboard. Only allowed for user whose turn it is.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "A unique integer value identifying this game.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddMove"
+              },
+              "example": {
+                "row": 2,
+                "column": 2
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Game updated successfully."
+          },
+          "400": {
+            "description": "Selected move was illegal, game is not ongoing or its other players turn.",
+            "content": {
+              "application/mason.vnd+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Select empty slot on board"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Game Item"
+        ]
+      }
+    },
+    "/api/games/{id}/join/": {
+      "put": {
+        "operationId": "joinGame",
+        "description": "Join a game with free slot.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "A unique integer value identifying this game.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.mason+json": {
+                "example": {
+                  "detail": "Successfully joined game",
+                  "@controls": {
+                    "self": {
+                      "description": "Current game",
+                      "href": "http://localhost:8000/api/games/1/"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "User was updated as the second player."
+          },
+          "401": {
+            "description": "Unauthenticated user",
+            "content": {
+              "application/vnd.mason+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "@error": {
+                    "@message": "Authentication credentials were not provided."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Game Item"
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKey": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "description": "Use retrieved api token with prefix Token {key}"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "description": "Generic error defined by mason protocol",
+        "properties": {
+          "@error": {
+            "type": "object",
+            "properties": {
+              "@message": {
+                "type": "string",
+                "description": "Error description"
+              },
+              "@messages": {
+                "type": "array",
+                "description": "Present only if multiple errors in one request",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UserCollection": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "password": {
+            "type": "string",
+            "writeOnly": true,
+            "maxLength": 128,
+            "minLength": 5
+          },
+          "win_percentage": {
+            "type": "string",
+            "format": "decimal",
+            "multipleOf": 0.01,
+            "maximum": 10,
+            "minimum": -10,
+            "readOnly": true
+          },
+          "wins": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "losses": {
+            "type": "integer",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "UserItem": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "password": {
+            "type": "string",
+            "writeOnly": true,
+            "maxLength": 128,
+            "minLength": 5
+          },
+          "win_percentage": {
+            "type": "string",
+            "format": "decimal",
+            "multipleOf": 0.01,
+            "maximum": 10,
+            "minimum": -10,
+            "readOnly": true
+          },
+          "wins": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "losses": {
+            "type": "integer",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "RuleList": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "rows": {
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 3
+          },
+          "columns": {
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 3
+          },
+          "winning_tick_count": {
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 3
+          },
+          "author": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "RuleDetail": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "rows": {
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 3
+          },
+          "columns": {
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 3
+          },
+          "winning_tick_count": {
+            "type": "integer",
+            "maximum": 10,
+            "minimum": 3
+          },
+          "author": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "Leader": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "readOnly": true
+          },
+          "win_percentage": {
+            "type": "string",
+            "format": "decimal",
+            "multipleOf": 0.01,
+            "maximum": 10,
+            "minimum": -10,
+            "readOnly": true
+          },
+          "wins": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "losses": {
+            "type": "integer",
+            "readOnly": true
+          }
+        }
+      },
+      "GameList": {
+        "type": "object",
+        "properties": {
+          "player1": {
+            "type": "string",
+            "nullable": true
+          },
+          "rule": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule"
+        ]
+      },
+      "AddMove": {
+        "type": "object",
+        "properties": {
+          "row": {
+            "type": "integer"
+          },
+          "column": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rule"
+        ]
+      },
+      "GameDetail": {
+        "type": "object",
+        "properties": {
+          "board": {
+            "type": "string",
+            "readOnly": true
+          },
+          "turn": {
+            "type": "integer",
+            "maximum": 3
+          },
+          "winner": {
+            "type": "integer",
+            "maximum": 3
+          },
+          "player1": {
+            "type": "string",
+            "nullable": true
+          },
+          "player2": {
+            "type": "string",
+            "nullable": true
+          },
+          "rule": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule"
+        ]
+      },
+      "AuthToken": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "password": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "token": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "GameCreate": {
+        "type": "object",
+        "properties": {
+          "rule": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule"
+        ]
+      },
+      "UserUpdate": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "password"
+        ]
+      }
+    }
+  }
+}
