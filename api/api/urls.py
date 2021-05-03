@@ -15,8 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
 
-from core.views import EntryPoint
+from core.views import EntryPoint, Schema
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -25,4 +26,12 @@ urlpatterns = [
     path("api/rules/", include("rules.urls")),
     path("api/leaderboard/", include("leaderboard.urls")),
     path("api/games/", include("games.urls")),
+    path("schema/", Schema.as_view(), name="schema"),
+    path("docs/",
+         TemplateView.as_view(
+             template_name='apidocs.html',
+             extra_context={'schema_url': 'schema'}
+         ),
+         name='swagger-ui'
+         ),
 ]

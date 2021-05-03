@@ -1,3 +1,4 @@
+import json
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
@@ -59,3 +60,14 @@ class EntryPoint(APIView):
                 }
             }
         return Response(response)
+
+
+with open("openapi.json") as f:
+    data = json.load(f)
+
+
+class Schema(APIView):
+    permission_classes = []
+
+    def get(self, request):
+        return Response(data=data)
