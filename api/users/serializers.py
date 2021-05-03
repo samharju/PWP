@@ -32,7 +32,9 @@ class UserItemSerializer(MasonItemSerializer):
             },
             'history': {
                 'description': "This users game history",
-                'href': reverse('games:game-list', request=request) + '?history=' + instance.pk
+                'href': reverse(
+                    'games:game-list', request=request
+                ) + '?history=' + instance.pk
             },
             'rules-created': {
                 'description': "Rules created by user",
