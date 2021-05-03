@@ -2,6 +2,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.settings import api_settings
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import User
@@ -80,6 +81,8 @@ class UserViewSet(ModelViewSet):
 
 
 class ObtainAuthTokenWithControls(ObtainAuthToken):
+
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
