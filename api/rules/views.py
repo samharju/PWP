@@ -87,9 +87,6 @@ class RuleViewSet(GenericViewSet,
             return mason_error("Can't remove rule that has been used in a game")
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def get_success_headers(self, data):
-        return {'Location': data['@controls']['self']['href']}
-
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
