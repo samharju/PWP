@@ -71,6 +71,14 @@ class RuleViewSet(GenericViewSet,
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    def get_success_headers(self, data):
+        return {'Location': data['@controls']['self']['href']}
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        response.data = None
+        return response
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         try:
