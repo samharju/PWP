@@ -56,6 +56,10 @@ class EntryPoint(APIView):
                     "rules": {
                         'description': "Rules",
                         "href": reverse('rules:rule-list', request=request),
+                    },
+                    "users": {
+                        'description': "Users",
+                        "href": reverse('users:user-list', request=request),
                     }
                 }
             }
