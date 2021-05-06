@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Q
 from rest_framework import status, mixins
 from rest_framework.decorators import action
@@ -73,6 +74,7 @@ class GameViewSet(GenericViewSet,
             status=status.HTTP_200_OK,
         )
 
+    @transaction.atomic
     @action(detail=True, methods=['put'], url_name='add-move', url_path='add-move')
     def add_move(self, request, pk=None):
         game = self.get_object()
