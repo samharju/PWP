@@ -13,8 +13,9 @@ case. For each model the test script should, at least:
 """
 import pytest
 from django.core.exceptions import ValidationError
+from django.db.models import ProtectedError, Q
 
-from core.models import Game
+from core.models import Game, User
 
 pytestmark = [pytest.mark.django_db, pytest.mark.models]
 
@@ -40,16 +41,30 @@ def test_game_duplicate_user_not_allowed(dummy_user, dummy_rule):
         )
 
 
-def test_get_game_by_player(dummy_user, dummy_rule):
+def test_get_game_by_player(dummy_rule, pate_and_esa):
     """Filter games by players."""
+    pate, esa = pate_and_esa
+    game1 = Game.objects.create(
+        player1=pate,
+        rule=dummy_rule
+    )
     Game.objects.create(
-        player1=dummy_user,
+        player1=pate,
+        player2=esa,
+        rule=dummy_rule
+    )
+    game3 = Game.objects.create(
+        player1=esa,
         rule=dummy_rule
     )
 
-    games = Game.objects.filter(player1=dummy_user)
-    assert len(games) == 1
-    assert games[0].player1 == dummy_user
+    games = Game.objects.filter(Q(player1=pate) | Q(player2=pate))
+    assert len(games) == 2
+    assert game3 not in games
+
+    games = Game.objects.filter(Q(player1=esa) | Q(player2=esa))
+    assert len(games) == 2
+    assert game1 not in games
 
 
 def test_update_game(dummy_user, dummy_rule):
@@ -76,3 +91,41 @@ def test_delete_game(dummy_user, dummy_rule):
     game.delete()
 
     assert 0 == len(Game.objects.filter(player1=dummy_user))
+
+
+def test_players_nullable(dummy_rule):
+    """If related players are deleted, foreign keys are set to null."""
+    pate = User.objects.create_user("pate")
+    esa = User.objects.create_user("esa")
+
+    game = Game.objects.create(
+        player1=pate,
+        player2=esa,
+        rule=dummy_rule
+    )
+
+    pate.delete()
+    esa.delete()
+
+    game.refresh_from_db()
+    assert game.player1 is None
+    assert game.player2 is None
+
+
+def test_rule_required(dummy_user, dummy_rule):
+    """Rule can not be null."""
+    with pytest.raises(ValidationError):
+        Game.objects.create(
+            player1=dummy_user
+        )
+
+
+def test_rule_protected(dummy_user, dummy_rule):
+    """Rule deletion blocked if foreign key relation exists."""
+    Game.objects.create(
+        player1=dummy_user,
+        rule=dummy_rule
+    )
+
+    with pytest.raises(ProtectedError):
+        dummy_rule.delete()

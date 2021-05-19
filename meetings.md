@@ -59,29 +59,29 @@ Checked db implementation.
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*
 
 ## Meeting 3.
-* **DATE:**
-* **ASSISTANTS:**
+* **DATE: 22.3.**
+* **ASSISTANTS: Mika Oja**
 
 ### Minutes
-*Summary of what was discussed during the meeting*
+* Api diagram complete
+* Api docs not finished
 
 ### Action points
-*List here the actions points discussed with assistants*
+* Diagram looks ok, finish apidoc
 
 
 ### Comments from staff
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*
 
 ## Meeting 4.
-* **DATE:**
-* **ASSISTANTS:**
+* **DATE: 19.4.**
+* **ASSISTANTS: Mika Oja**
 
 ### Minutes
-*Summary of what was discussed during the meeting*
+* Quick code review
 
 ### Action points
-*List here the actions points discussed with assistants*
-
+* Add descriptions to controls
 
 ### Comments from staff
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*

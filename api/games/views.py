@@ -1,9 +1,12 @@
-from rest_framework import status
+from django.db import transaction
+from django.db.models import Q
+from rest_framework import status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
 
+from api.error_handlers import mason_error
 from core.models import Game
 from games.serializers import (
     GameCreateSerializer, GameDetailSerializer,
@@ -23,28 +26,36 @@ def update_player_stats(winner, loser):
         user.save()
 
 
-class GameViewSet(ModelViewSet):
+class GameViewSet(GenericViewSet,
+                  mixins.RetrieveModelMixin,
+                  mixins.CreateModelMixin,
+                  mixins.ListModelMixin):
 
     queryset = Game.objects.all()
 
     def get_queryset(self):
         if self.action == 'list':
-            return Game.objects.filter(player2=None)
+            if user := self.request.query_params.get('history'):
+                queryset = Game.objects.filter(
+                    Q(player1=user) | Q(player2=user),
+                    ~Q(winner=0)
+                )
+            else:
+                queryset = Game.objects.filter(player2=None) | \
+                       Game.objects.filter(
+                           Q(winner=0),
+                           Q(player1=self.request.user) | Q(player2=self.request.user)
+                       )
+            return queryset
         return self.queryset
 
     @action(detail=True, methods=['put'], url_name='join')
     def join(self, request, pk=None):
         game = self.get_object()
         if request.user in [game.player1, game.player2]:
-            return Response(
-                {'detail': 'You are already in this game'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return mason_error('You are already in this game')
         if game.player2:
-            return Response(
-                {'detail': 'Can\'t join full game'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return mason_error('Can\'t join full game')
         game.player2 = request.user
         game.turn = 1
         game.save()
@@ -53,6 +64,7 @@ class GameViewSet(ModelViewSet):
                 'detail': 'Successfully joined game',
                 '@controls': {
                     'self': {
+                        'description': "Current game",
                         'href': reverse(
                             'games:game-detail', request=request, args=(pk,)
                         )
@@ -62,6 +74,7 @@ class GameViewSet(ModelViewSet):
             status=status.HTTP_200_OK,
         )
 
+    @transaction.atomic
     @action(detail=True, methods=['put'], url_name='add-move', url_path='add-move')
     def add_move(self, request, pk=None):
         game = self.get_object()
@@ -71,24 +84,13 @@ class GameViewSet(ModelViewSet):
         row = request.data.get('row')
         col = request.data.get('column')
 
-        error_msg = {
-            '@controls': {
-                'up': {
-                    'href': reverse(
-                        'games:game-detail', request=request, args=(pk,)
-                    )
-                }
-            }
-        }
-        if not all([row, col]):
-            error_msg['detail'] = 'Row and column are required values'
-            return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+        if not all([row is not None, col is not None]):
+            return mason_error('Row and column are required values')
 
         move = Move(int(row), int(col), marker)
         ok, error = add_move_if_ok(board, move)
         if not ok:
-            error_msg['detail'] = error
-            return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+            return mason_error(error)
 
         if game.turn == 1:
             game.turn = 2
@@ -133,9 +135,11 @@ class GameViewSet(ModelViewSet):
             'items': serializer.data,
             '@controls': {
                 'up': {
+                    'description': "Main menu",
                     'href': reverse('entrypoint', request=request)
                 },
                 'create': {
+                    'description': "Create game",
                     'href': reverse('games:game-list', request=request),
                     'method': 'POST',
                     'schema': {

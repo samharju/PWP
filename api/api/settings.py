@@ -87,7 +87,7 @@ ROOT_URLCONF = "api.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": ["templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -146,7 +146,8 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_RENDERER_CLASSES": [
         "api.renderers.MasonRenderer"
-    ]
+    ],
+    "EXCEPTION_HANDLER": "api.error_handlers.custom_exception_handler"
 }
 
 

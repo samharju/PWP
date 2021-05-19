@@ -7,13 +7,11 @@ from core.serializers import MasonItemSerializer
 user_schema = {
     "type": "object",
     "properties": {
-        "username": {
-            "type": "string"
-        },
         "password": {
             "type": "string"
         }
-    }
+    },
+    "required": ["password"]
 }
 
 
@@ -25,15 +23,21 @@ class UserItemSerializer(MasonItemSerializer):
         author_query = f'?author={instance.pk}'
         controls = {
             'self': {
+                'description': "Current user",
                 'href': self_href
             },
             'collection': {
+                'description': "List of Users",
                 'href': reverse('users:user-list', request=request)
             },
             'history': {
-                'href': 'todo'
+                'description': "This users game history",
+                'href': reverse(
+                    'games:game-list', request=request
+                ) + '?history=' + instance.pk
             },
             'rules-created': {
+                'description': "Rules created by user",
                 'href': reverse('rules:rule-list', request=request) + author_query,
             }
         }
@@ -41,11 +45,13 @@ class UserItemSerializer(MasonItemSerializer):
             controls.update(
                 **{
                     'edit': {
+                        'description': "Change password",
                         'href': self_href,
                         'method': 'PUT',
                         'schema': user_schema
                     },
                     'delete': {
+                        'description': "Remove User",
                         'href': self_href,
                         'method': 'DELETE'
                     }
@@ -75,12 +81,20 @@ class UserItemSerializer(MasonItemSerializer):
         return user
 
 
+class UserUpdateSerializer(UserItemSerializer):
+
+    class Meta:
+        model = get_user_model()
+        fields = ('password',)
+
+
 class UserCollectionSerializer(UserItemSerializer):
 
     def create_controls(self, instance, request):
         self_href = reverse('users:user-detail', request=request, args=(instance.pk,))
         return {
             'self': {
+                'description': "Current User",
                 'href': self_href
             }
         }

@@ -1,9 +1,11 @@
-from rest_framework import permissions
+from django.db.models import ProtectedError
+from rest_framework import mixins, permissions, status
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
 
+from api.error_handlers import mason_error
 from core.models import Rule
 from rules.serializers import RuleDetailSerializer, RuleListSerializer
 
@@ -46,16 +48,19 @@ create_schema = {
 }
 
 
-class RuleViewSet(ModelViewSet):
+class RuleViewSet(GenericViewSet,
+                  mixins.ListModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.CreateModelMixin,
+                  mixins.DestroyModelMixin):
 
     queryset = Rule.objects.all()
     permission_classes = [IsAuthenticated, OwnerEditOnly]
 
     def get_queryset(self):
-        queryset = self.queryset
-        username = self.request.query_params.get('author')
-        if username is not None:
-            queryset = queryset.filter(author__username=username)
+        queryset = super().get_queryset()
+        if (username := self.request.query_params.get('author')) is not None:
+            return queryset.filter(author__username=username)
         return queryset
 
     def get_serializer_class(self):
@@ -69,6 +74,19 @@ class RuleViewSet(ModelViewSet):
     def get_success_headers(self, data):
         return {'Location': data['@controls']['self']['href']}
 
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        response.data = None
+        return response
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        try:
+            instance.delete()
+        except ProtectedError:
+            return mason_error("Can't remove rule that has been used in a game")
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
@@ -76,9 +94,11 @@ class RuleViewSet(ModelViewSet):
             'items': serializer.data,
             '@controls': {
                 'up': {
-                    'href': reverse('entrypoint', request=request)
+                    'description': "Main menu",
+                    'href': reverse('entrypoint', request=request),
                 },
                 'create': {
+                    'description': "Create rule",
                     'href': reverse('rules:rule-list', request=request),
                     'method': 'POST',
                     'schema': create_schema

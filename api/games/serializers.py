@@ -11,6 +11,7 @@ class GameCreateSerializer(MasonItemSerializer):
     def create_controls(self, instance, request):
         return {
             'self': {
+                'description': "Game detail",
                 'href': reverse(
                     'games:game-detail', request=request, args=(instance.id,)
                 )
@@ -27,6 +28,7 @@ class GameListSerializer(MasonItemSerializer):
     def create_controls(self, instance, request):
         return {
             'self': {
+                'description': "Game details",
                 'href': reverse(
                     'games:game-detail', request=request, args=(instance.id,)
                 )
@@ -45,7 +47,7 @@ class BoardSerializer(Field):
 
     def to_internal_value(self, data):
         """This is a read-only serializer."""
-        pass
+        raise NotImplementedError("This serializer is read-only!")  # pragma: no cover
 
     def get_attribute(self, instance):
         """Override parent method to have access to multiple parent instance fields
@@ -64,6 +66,7 @@ class GameDetailSerializer(MasonItemSerializer):
     def create_controls(self, instance, request):
         self_href = reverse('games:game-detail', request=request, args=(instance.id,))
         controls = {
+            'description': "Game",
             'self': {
                 'href': self_href
             }
@@ -72,6 +75,7 @@ class GameDetailSerializer(MasonItemSerializer):
             controls.update(
                 **{
                     'join': {
+                        'description': "Join game",
                         'href': reverse(
                             'games:game-join', request=request,
                             args=(instance.id,)
@@ -86,6 +90,7 @@ class GameDetailSerializer(MasonItemSerializer):
                 controls.update(
                     **{
                         'add-move': {
+                            'description': "Add move",
                             'href': reverse('games:game-add-move', args=(instance.id,)),
                             'method': 'PUT',
                             'schema': {
