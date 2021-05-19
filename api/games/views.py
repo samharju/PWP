@@ -117,6 +117,7 @@ class GameViewSet(GenericViewSet,
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         response.data = None
+        response['Access-Control-Expose-Headers'] = 'Location'
         return response
 
     def perform_create(self, serializer):
